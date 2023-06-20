@@ -1,0 +1,30 @@
+name: Scheduled launch
+on:
+  schedule:
+    - cron:  '00 19 * * *'
+
+jobs:
+  build:
+    name: Launch
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check Out Repository
+        uses: actions/checkout@v3
+        
+      - name: Generate keys
+        run: |
+          cat > ./keys.json << EOF
+          ${{ secrets.KEYS }}
+          EOF
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin' # See 'Supported distributions' for available options
+          java-version: '17' # Change this to match your desired Java version
+
+
+      - name: Build JAR
+        run: |
+          java -jar artifacts/whappens-1.0.jar days=7 prod=true
